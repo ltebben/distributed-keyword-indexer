@@ -30,6 +30,6 @@ class Scrape:
         return [text, links]
 
 
-s = Scrape()
-text, links = s.scrape("https://www.nbcnews.com/")
-print(text, links)
+# s = Scrape()
+# text, links = s.scrape("https://www.nbcnews.com/")
+# print(text, links)

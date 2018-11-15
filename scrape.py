@@ -8,11 +8,10 @@ class Scrape:
 
     def getLinks(self, html):
         links = []
-        for l in html('a'):
-            l = l.extract()#.encode('utf-8')
-            m = re.match(r'<a href="(https://[^\s]*)">', str(l))
-            if m:
-                links.append(m.groups()[0].lower())
+        for l in html.find_all('a'):
+            l = l.get('href')
+            if l and l.startswith("https://"):
+                links.append(l)
         return links
 
     def makeRequest(self, url):
@@ -26,9 +25,9 @@ class Scrape:
         if not r:
             return None
         html = BeautifulSoup(r, 'html.parser')
-        html_string = [s.encode("utf-8") for s in html.select('body')]
         links = self.getLinks(html)
-        return [html_string, links]
+        text = html.get_text()
+        return [text, links]
 
 
 s = Scrape()

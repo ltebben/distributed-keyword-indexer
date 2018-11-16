@@ -8,4 +8,4 @@ Parallel Computing final project
 * Install mpi4py: `pip install mpy4py`
 
 # To run
-* run: `exec -n <total number of nodes> python main.py`
+* run: `mpiexec -n <total number of nodes> python main.py`

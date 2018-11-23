@@ -11,7 +11,7 @@ class Scrape:
     def getLinks(self):
         return self.links
 
-    def setUrl(self):
+    def setUrl(self, url):
         self.url = url
 
     def findLinks(self, html):
@@ -35,6 +35,7 @@ class Scrape:
         text = html.get_text()
         return [text, self.discoveredLinks]
 
-# s = Scrape()
-# text, links = s.scrape("https://www.nbcnews.com/")
-# print(text, links)
+s = Scrape()
+s.setUrl("http://www.bbc.com/")
+text, links = s.scrape()
+print(text.encode('utf8'), links)

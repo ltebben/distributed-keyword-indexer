@@ -21,7 +21,7 @@ class Scrape:
                 self.discoveredLinks.append(l)
 
     def makeRequest(self, url):
-        r = requests.get(url, timeout=10)
+        r = requests.get(url, timeout=60)
         if not r or r.status_code != 200:
             return None
         return r.content
@@ -29,7 +29,7 @@ class Scrape:
     def scrape(self):
         r = self.makeRequest(self.url)
         if not r:
-            return None
+            return [None, None]
         html = BeautifulSoup(r, 'html.parser')
         self.findLinks(html)
         text = html.get_text()

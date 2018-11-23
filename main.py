@@ -18,12 +18,14 @@ if rank == 0:
   for i in range(1, size):
     comm.send(sources[(i-1) % len(sources)], dest=i)
     newlinks = comm.recv(source=i)
-    with open(SOURCES_LOC, 'a') as w:
-      w.write("\n")
-      w.write('\n'.join(newlinks))
+    print(newlinks)
+    # with open(SOURCES_LOC, 'a') as w:
+    #   w.write("\n")
+    #   w.write('\n'.join(newlinks))
 else:
   # Wait to receive a source from the master 
   source = comm.recv(source=0) 
   s.setUrl(source)
-  _, links = s.scrape()
+  text, links = s.scrape()
+  print(links)
   comm.send(links, dest=0)

@@ -3,16 +3,22 @@ from bs4 import BeautifulSoup
 import re
 
 class Scrape:
+    
     def __init__(self, url=None):
         self.url = url
+        self.discoveredLinks = []
+    
+    def getLinks(self):
+        return self.links
 
-    def getLinks(self, html):
-        links = []
+    def setUrl(self):
+        self.url = url
+
+    def findLinks(self, html):
         for l in html.find_all('a'):
             l = l.get('href')
             if l and l.startswith("https://"):
-                links.append(l)
-        return links
+                self.discoveredLinks.append(l)
 
     def makeRequest(self, url):
         r = requests.get(url, timeout=10)
@@ -20,15 +26,14 @@ class Scrape:
             return None
         return r.content
 
-    def scrape(self, url):
+    def scrape(self, url=self.url):
         r = self.makeRequest(url)
         if not r:
             return None
         html = BeautifulSoup(r, 'html.parser')
-        links = self.getLinks(html)
+        self.findLinks(html)
         text = html.get_text()
-        return [text, links]
-
+        return [text, self.discoveredLinks]
 
 # s = Scrape()
 # text, links = s.scrape("https://www.nbcnews.com/")

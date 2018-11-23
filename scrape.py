@@ -35,7 +35,7 @@ class Scrape:
         text = html.get_text()
         return [text, self.discoveredLinks]
 
-s = Scrape()
-s.setUrl("http://www.bbc.com/")
-text, links = s.scrape()
-print(text.encode('utf8'), links)
+# s = Scrape()
+# s.setUrl("http://www.bbc.com/")
+# text, links = s.scrape()
+# print(text.encode('utf8'), links)

@@ -26,8 +26,8 @@ class Scrape:
             return None
         return r.content
 
-    def scrape(self, url=self.url):
-        r = self.makeRequest(url)
+    def scrape(self):
+        r = self.makeRequest(self.url)
         if not r:
             return None
         html = BeautifulSoup(r, 'html.parser')

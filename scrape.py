@@ -17,8 +17,11 @@ class Scrape:
     def findLinks(self, html):
         for l in html.find_all('a'):
             l = l.get('href')
-            if l and l.startswith("https://"):
+            if l and (l.startswith("https://") or l.startswith("http://")):
                 self.discoveredLinks.append(l)
+            # TODO: Decide if we want to accept relative links too
+            # elif l.startswith("/"):
+            #     self.discoveredLinks.append(self.url+l)
 
     def makeRequest(self, url):
         r = requests.get(url, timeout=60)

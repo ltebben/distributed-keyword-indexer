@@ -11,23 +11,29 @@ size = comm.Get_size()
 # Initialize root set of sources
 sources_file = open(SOURCES_LOC, "r")
 sources = sources_file.readlines()
-sources = set(sources)
+explored = set()
+
 if rank == 0:
   # Distribute sources to each worker. If more workers than sources, give same
   # sources to multiple workers so they can take different walks
   i = 0
   while sources:
-    comm.send(sources.pop(), dest=i)
-    newlinks = comm.recv(source=i)
+    ind = i%size
+    link = sources.pop(0)
+    comm.send(link, dest=ind)
+    newlinks = comm.recv(source=ind)
     print(newlinks)
-    sources|=set(newlinks)
+    for link in newlinks:
+      if link not in explored:
+        sources.append(link)
+        explored.add(link)
     # with open(SOURCES_LOC, 'a') as w:
     #   w.write("\n")
     #   w.write('\n'.join(newlinks))
-    i+=1
+    i += 1
 else:
-  # Wait to receive a source from the master 
-  source = comm.recv(source=0) 
+  # Wait to receive a source from the master
+  source = comm.recv(source=0)
   s.setUrl(source.strip())
   text, links = s.scrape()
   comm.send(links, dest=0)

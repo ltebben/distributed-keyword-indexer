@@ -17,7 +17,7 @@ if rank == 0:
   # sources to multiple workers so they can take different walks
   i = 0
   while sources:
-    comm.send(sources[i], dest=i)
+    comm.send(sources.pop(), dest=i)
     newlinks = comm.recv(source=i)
     print(newlinks)
     sources|=set(newlinks)

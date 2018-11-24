@@ -16,7 +16,7 @@ explored = set()
 if rank == 0:
   # Distribute sources to each worker. If more workers than sources, give same
   # sources to multiple workers so they can take different walks
-  i = 0
+  i = 1
   
   # TODO: remove i<10 and put this stuff in the db instead of a local array
   while sources and i<10:

@@ -9,7 +9,7 @@ class Scrape:
         self.discoveredLinks = []
     
     def getLinks(self):
-        return self.links
+        return self.discoveredLinks
 
     def setUrl(self, url):
         self.url = url

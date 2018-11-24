@@ -15,14 +15,16 @@ sources = set(sources)
 if rank == 0:
   # Distribute sources to each worker. If more workers than sources, give same
   # sources to multiple workers so they can take different walks
+  i = 0
   while sources:
-    comm.send(sources[(i-1) % len(sources)], dest=i)
+    comm.send(sources[i], dest=i)
     newlinks = comm.recv(source=i)
     print(newlinks)
     sources|=set(newlinks)
     # with open(SOURCES_LOC, 'a') as w:
     #   w.write("\n")
     #   w.write('\n'.join(newlinks))
+    i+=1
 else:
   # Wait to receive a source from the master 
   source = comm.recv(source=0) 

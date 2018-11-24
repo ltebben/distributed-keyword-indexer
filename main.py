@@ -17,7 +17,9 @@ if rank == 0:
   # Distribute sources to each worker. If more workers than sources, give same
   # sources to multiple workers so they can take different walks
   i = 0
-  while sources:
+  
+  # TODO: remove i<10 and put this stuff in the db instead of a local array
+  while sources and i<10:
     ind = i%size
     link = sources.pop(0)
     comm.send(link, dest=ind)

@@ -37,5 +37,5 @@ else:
   # Wait to receive a source from the master
   source = comm.recv(source=0)
   s.setUrl(source.strip())
-  text, links = s.scrape()
+  keywords, links = s.scrape()
   comm.send(links, dest=0)

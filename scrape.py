@@ -30,14 +30,28 @@ class Scrape:
             return None
         return r.content
 
+    def findKeywords(self, html):
+        keywords = set()
+        # Get all paragraph tags in the html
+        for p in html.find_all('p'):
+            # split contents of paragraph to words list
+            string = p.string
+            if string is None:
+                continue
+            words = string.split(' ')
+            # if there are less than 10 words, don't bother
+            if len(words) > 10:
+                keywords.update(words)
+        return keywords
+
     def scrape(self):
         r = self.makeRequest(self.url)
         if not r:
             return [None, None]
         html = BeautifulSoup(r, 'html.parser')
         self.findLinks(html)
-        text = html.get_text()
-        return [text, self.discoveredLinks]
+        keywords = self.findKeywords(html)
+        return [keywords, self.discoveredLinks]
 
 # s = Scrape()
 # s.setUrl("http://www.bbc.com/")

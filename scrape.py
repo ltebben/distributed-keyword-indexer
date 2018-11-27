@@ -8,6 +8,12 @@ class Scrape:
     def __init__(self, url=None):
         self.url = url
         self.discoveredLinks = []
+        # load the stop words from disk
+        with open('stop-words.txt', 'r') as stopWordsFile:
+            self.stopWords = set()
+            self.stopWords.update(stopWordsFile.readlines())
+            # remove '/n' from the end of all words
+            self.stopWords = [word[:-1] for word in self.stopWords]
 
     def getLinks(self):
         return self.discoveredLinks
@@ -34,15 +40,18 @@ class Scrape:
         keywords = set()
         # Get all paragraph tags in the html
         for p in html.find_all('p'):
-            # split contents of paragraph to words list
+            # get content and make sure it's real
             string = p.string
             if string is None:
                 continue
+            # lowercase and split contents of paragraph to words list
+            string = string.lower()
             words = string.split(' ')
             # if there are less than 10 words, don't bother
             if len(words) > 10:
                 keywords.update(words)
-        return keywords
+        # Remove all stop words from the set
+        return keywords.difference(self.stopWords)
 
     def scrape(self):
         r = self.makeRequest(self.url)

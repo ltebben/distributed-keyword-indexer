@@ -2,12 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
+
 class Scrape:
-    
+
     def __init__(self, url=None):
         self.url = url
         self.discoveredLinks = []
-    
+
     def getLinks(self):
         return self.discoveredLinks
 

@@ -75,7 +75,8 @@ class Scrape:
       inserts = [UpdateMany({"word": word}, {"$push": {"urls": self.url}}, upsert=True) for word in words]
       
       # Submit requests
-      self.collection.bulk_write(inserts)
+      if len(inserts) > 0:
+        self.collection.bulk_write(inserts)
 
 # s = Scrape()
 # s.setUrl("http://www.bbc.com/")

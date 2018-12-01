@@ -42,9 +42,6 @@ if rank == 0:
 
     # Distribute sources to each worker. If more workers than sources, give same
     # sources to multiple workers so they can take different walks
-    i = 1
-    
-    # TODO: remove i<10 and put this stuff in the db instead of a local array
 
     # The given index in this request object list corresponds to the worker of id index + 1
     receiveMessages = list()
@@ -59,7 +56,7 @@ if rank == 0:
             comm.isend('', dest=idx+1)
             
     # do stuff
-    while len(sources) > 0 and i < 10:
+    while len(sources) > 0:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             res = req.test()
@@ -88,7 +85,6 @@ if rank == 0:
                     else:
                         status.count("Number of repeated links")
                        
-                i+=1
 else: 
     while True:
         # Wait to receive a source from the master

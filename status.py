@@ -26,7 +26,7 @@ class Status:
     for key, val in stats.items():
       self.stats[key] = val
 
-    statsStrs = [str(key) + ": " + str(val) for key, val in self.stats.items()]
+    statsStrs = sorted([str(key) + ": " + str(val) for key, val in self.stats.items()])
     statStr = "\r" + " | ".join(statsStrs)
     print(statStr, end="", flush=True)
 

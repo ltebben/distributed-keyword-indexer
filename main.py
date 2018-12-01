@@ -96,20 +96,23 @@ else:
             # We got a blank link, wait for a while then ask again
             time.sleep(1)
         else:
-            parts = source.split('/')
-            baseurl = '/'.join(parts[0:3])
-            rp = roboparser.RobotFileParser()
-            rp.set_url(baseurl + '/robots.txt')
-            rp.read()
+            try:
+                parts = source.split('/')
+                baseurl = '/'.join(parts[0:3])
+                rp = roboparser.RobotFileParser()
+                rp.set_url(baseurl + '/robots.txt')
+                rp.read()
 
-            if rp.can_fetch('*', baseurl):
-                s.setUrl(source.strip())
-                keywords, links = s.scrape()
+                if rp.can_fetch('*', baseurl):
+                    s.setUrl(source.strip())
+                    keywords, links = s.scrape()
 
-                print("number of links: " + str(len(links)))
+                    print("number of links: " + str(len(links)))
 
-                # Persist keywords to the database
-                s.submitWords(keywords)
+                    # Persist keywords to the database
+                    s.submitWords(keywords)
+            except Exception, e:
+                print(str(e))
 
         # Send new links back to the master queue
         comm.send(links, dest=0) 

@@ -102,17 +102,19 @@ else:
             rp.set_url(baseurl + '/robots.txt')
             try:
                 rp.read()
+                if rp.can_fetch('*', baseurl):
+                    s.setUrl(source.strip())
+                    keywords, links = s.scrape()
+
+                    print("number of links: " + str(len(links)))
+
+                    # Persist keywords to the database
+                    s.submitWords(keywords)
             except Exception as e:
+                print(baseurl)
                 print(str(e))
 
-            if rp.can_fetch('*', baseurl):
-                s.setUrl(source.strip())
-                keywords, links = s.scrape()
-
-                print("number of links: " + str(len(links)))
-
-                # Persist keywords to the database
-                s.submitWords(keywords)
+            
             
         # Send new links back to the master queue
         comm.send(links, dest=0) 

@@ -1,3 +1,7 @@
+# .pyc and python cache files
+*.pyc
+__pycache__
+
 # venv files
 bin
 lib

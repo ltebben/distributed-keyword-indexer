@@ -44,20 +44,17 @@ if rank == 0:
     # Create lists of messages/lists
     # The given index in these lists corresponds to the worker of id index + 1
     receiveMessages = list()
-    receiveLinks = list()
     sendMessages = list()
     for idx in range(size - 1):
-        receiveLinks.append(None)
-        receiveMessages.append(comm.Irecv(receiveLinks[idx], source=idx+1))
+        receiveMessages.append(comm.irecv(source=idx+1))
     # do stuff
     while source and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             if req.test():
-                links = copy.copy(receiveLinks[idx])
-                sendMessages.append(comm.Isend(sources.pop(0), dest=idx+1))
-                receiveLinks[idx] = None
-                receiveMessages[idx] = comm.Irecv(receiveLinks[idx], source=idx+1);
+                links = req.wait()
+                sendMessages.append(comm.isend(sources.pop(0), dest=idx+1))
+                receiveMessages[idx] = comm.irecv(receiveLinks[idx], source=idx+1);
                 for link in links:
                     if link not in explored:
                         sources.append(link)

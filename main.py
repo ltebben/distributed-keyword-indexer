@@ -35,46 +35,46 @@ sources = sources_file.readlines()
 explored = set()
 
 if rank == 0:
-  # Distribute sources to each worker. If more workers than sources, give same
-  # sources to multiple workers so they can take different walks
-  i = 1
-  
-  # TODO: remove i<10 and put this stuff in the db instead of a local array
+    # Distribute sources to each worker. If more workers than sources, give same
+    # sources to multiple workers so they can take different walks
+    i = 1
+    
+    # TODO: remove i<10 and put this stuff in the db instead of a local array
 
-  # Create lists of messages/lists
-  # The given index in these lists corresponds to the worker of id index + 1
-  receiveMessages = list()
-  receiveLinks = list()
-  sendMessages = list()
-  for idx in range(size - 1):
-    receiveLinks.append(None)
-    receiveMessages.append(comm.Irecv(receiveLinks[idx], source=idx+1))
-  # do stuff
-  while source and i < 10:
-    for idx, req in enumerate(receiveMessages):
-      # Check to see if the request has come back yet
-      if req.test():
-        links = copy.copy(receiveLinks[idx])
-        sendMessages.append(comm.Isend(sources.pop(0), dest=idx+1))
-        receiveLinks[idx] = None
-        receiveMessages[idx] = comm.Irecv(receiveLinks[idx], source=idx+1);
-        for link in links:
-          if link not in explored:
-            sources.append(link)
-            explored.add(link)
-        i+=1
+    # Create lists of messages/lists
+    # The given index in these lists corresponds to the worker of id index + 1
+    receiveMessages = list()
+    receiveLinks = list()
+    sendMessages = list()
+    for idx in range(size - 1):
+        receiveLinks.append(None)
+        receiveMessages.append(comm.Irecv(receiveLinks[idx], source=idx+1))
+    # do stuff
+    while source and i < 10:
+        for idx, req in enumerate(receiveMessages):
+            # Check to see if the request has come back yet
+            if req.test():
+                links = copy.copy(receiveLinks[idx])
+                sendMessages.append(comm.Isend(sources.pop(0), dest=idx+1))
+                receiveLinks[idx] = None
+                receiveMessages[idx] = comm.Irecv(receiveLinks[idx], source=idx+1);
+                for link in links:
+                    if link not in explored:
+                        sources.append(link)
+                        explored.add(link)
+                i+=1
 else: 
-  while True:
-    # Wait to receive a source from the master
-    source = comm.recv(source=0)
+    while True:
+        # Wait to receive a source from the master
+        source = comm.recv(source=0)
 
-    s.setUrl(source.strip())
-    keywords, links = s.scrape()
+        s.setUrl(source.strip())
+        keywords, links = s.scrape()
 
-    print("number of links: " + str(len(links)))
+        print("number of links: " + str(len(links)))
 
-    # Persist keywords to the database
-    s.submitWords(keywords)
+        # Persist keywords to the database
+        s.submitWords(keywords)
 
-    # Send new links back to the master queue
-    comm.send(links, dest=0)  
+        # Send new links back to the master queue
+        comm.send(links, dest=0)  

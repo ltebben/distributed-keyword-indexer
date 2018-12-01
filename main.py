@@ -74,7 +74,7 @@ if rank == 0:
                     # If there is no link, send a blank string and the worker will wait
                     comm.isend('', dest=idx+1)
                 # start a new receive message from workers
-                receiveMessages[idx] = comm.irecv(receiveLinks[idx], source=idx+1);
+                receiveMessages[idx] = comm.irecv(source=idx+1)
                 status.count("Number of discovered links")
                 # add the new links to the sources
                 for link in links:

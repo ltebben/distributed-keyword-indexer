@@ -1,6 +1,6 @@
 import os
 import time
-import urllib.robotparser
+import urllib.robotparser as roboparser
 from mpi4py import MPI
 from pymongo import MongoClient
 
@@ -97,12 +97,12 @@ else:
             time.sleep(1)
         else:
             parts = source.split('/')
-            baseurl = '/'.join(parts[0:2])
-            rp = robotparser.RobotFilerParser()
+            baseurl = '/'.join(parts[0:3])
+            rp = roboparser.RobotFileParser()
             rp.set_url(baseurl + '/robots.txt')
             rp.read()
 
-            if rp.can_fetch('*', url):
+            if rp.can_fetch('*', baseurl):
                 s.setUrl(source.strip())
                 keywords, links = s.scrape()
 

@@ -10,7 +10,9 @@ from scrape import Scrape
 from status import Status
 
 # Define constants for config files
+LOG_PATH = os.environ["LOG_PATH"]
 SOURCES_LOC = "sources.txt"
+
 MONGO_HOST = os.environ["MONGO_HOST"]
 MONGO_PORT = os.environ["MONGO_PORT"]
 MONGO_USER = os.environ["MONGO_USER"]
@@ -46,7 +48,7 @@ else:
 
 if rank == 0:
     # Initialize status object
-    status = Status()
+    status = Status(LOG_PATH)
 
     # Distribute sources to each worker. If more workers than sources, give same
     # sources to multiple workers so they can take different walks

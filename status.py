@@ -1,6 +1,6 @@
 class Status:
-  def __init__(self, logFile=None):
-    self.logFile = logFile  
+  def __init__(self, logPath=None):
+    self.logFile = open(logPath, "w")
     self.stats = {}
 
   # Get list of all stats being checked
@@ -27,9 +27,15 @@ class Status:
       self.stats[key] = val
 
     statsStrs = sorted([str(key) + ": " + str(val) for key, val in self.stats.items()])
-    statStr = "\r" + " | ".join(statsStrs)
-    print(statStr, end="", flush=True)
+    statStr = " | ".join(statsStrs)
+    
+    # Write the status to a logfile
+    self.logFile.write(statStr + "\n")
+
+    # Print the status
+    print("\r" + statStr, end="", flush=True)
 
   # Give a new line at the end of reporting status
   def end(self):
-    print("Ending status\n") 
+    self.logFile.close()
+    print("\nEnding status\n") 

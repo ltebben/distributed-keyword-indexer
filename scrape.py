@@ -24,8 +24,10 @@ class Scrape:
         links = []
         for l in html.find_all('a'):
             l = l.get('href')
-            pattern = re.match(r"(http[s]?://.*[\.com]/).*", l)
+            pattern = re.match(r"(http[s]?://.*(\.com|\.org)/).*", l)
             if pattern and self.url.startswith(pattern.group(1)):
+                if 'video.' in l or '/video/' in l:
+                    continue
                 links.append(l)
             # TODO: Decide if we want to accept relative links too
             # elif l.startswith("/"):

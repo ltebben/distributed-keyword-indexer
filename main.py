@@ -1,5 +1,5 @@
 import os
-import copy
+import time
 from mpi4py import MPI
 from pymongo import MongoClient
 
@@ -50,16 +50,29 @@ if rank == 0:
     receiveMessages = list()
     for idx in range(size - 1):
         receiveMessages.append(comm.irecv(source=idx+1))
+        # Send links to workers
+        if len(sources) > 0:
+            # If there's a link to send, send it
+            comm.isend(sources.pop(0), dest=idx+1)
+        else:
+            # If there is no link, send a blank string and the worker will wait
+            comm.isend('', dest=idx+1)
+            
     # do stuff
     while len(sources) > 0 and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             print("req.test(): " + str(req.test()))
-            if req.test():
+            if req.test()[0]:
                 # Get the links the worker found
                 links = req.wait()
                 # Send the worker the next link to work on
-                comm.isend(sources.pop(0), dest=idx+1)
+                if len(sources) > 0:
+                    # If there's a link to send, send it
+                    comm.isend(sources.pop(0), dest=idx+1)
+                else:
+                    # If there is no link, send a blank string and the worker will wait
+                    comm.isend('', dest=idx+1)
                 # start a new receive message from workers
                 receiveMessages[idx] = comm.irecv(receiveLinks[idx], source=idx+1);
                 status.count("Number of discovered links")
@@ -76,6 +89,11 @@ else:
     while True:
         # Wait to receive a source from the master
         source = comm.recv(source=0)
+
+        if source == '':
+            # We got a blank link, wait for a while then ask again
+            time.sleep(1)
+            continue
 
         s.setUrl(source.strip())
         keywords, links = s.scrape()

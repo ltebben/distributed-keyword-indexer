@@ -1,11 +1,13 @@
 import os
 import copy
 from mpi4py import MPI
-from scrape import Scrape
 from pymongo import MongoClient
 
-# Define constants for config files
+# Import project modules
+from scrape import Scrape
+from status import Status
 
+# Define constants for config files
 SOURCES_LOC = "sources.txt"
 MONGO_HOST = os.environ["MONGO_HOST"]
 MONGO_PORT = os.environ["MONGO_PORT"]
@@ -35,6 +37,9 @@ sources = sources_file.readlines()
 explored = set()
 
 if rank == 0:
+    # Initialize status object
+    status = Status()
+
     # Distribute sources to each worker. If more workers than sources, give same
     # sources to multiple workers so they can take different walks
     i = 1
@@ -51,14 +56,19 @@ if rank == 0:
     while sources and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
+            print("req.test(): " + str(req.test()))
             if req.test():
                 links = req.wait()
                 sendMessages.append(comm.isend(sources.pop(0), dest=idx+1))
                 receiveMessages[idx] = comm.irecv(receiveLinks[idx], source=idx+1);
+                status.count("Number of discovered links")
                 for link in links:
                     if link not in explored:
                         sources.append(link)
                         explored.add(link)
+                    else:
+                        status.count("Number of repeated links")
+                       
                 i+=1
 else: 
     while True:

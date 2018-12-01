@@ -46,22 +46,24 @@ if rank == 0:
     
     # TODO: remove i<10 and put this stuff in the db instead of a local array
 
-    # Create lists of messages/lists
-    # The given index in these lists corresponds to the worker of id index + 1
+    # The given index in this request object list corresponds to the worker of id index + 1
     receiveMessages = list()
-    sendMessages = list()
     for idx in range(size - 1):
         receiveMessages.append(comm.irecv(source=idx+1))
     # do stuff
-    while sources and i < 10:
+    while len(sources) > 0 and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             print("req.test(): " + str(req.test()))
             if req.test():
+                # Get the links the worker found
                 links = req.wait()
-                sendMessages.append(comm.isend(sources.pop(0), dest=idx+1))
+                # Send the worker the next link to work on
+                comm.isend(sources.pop(0), dest=idx+1)
+                # start a new receive message from workers
                 receiveMessages[idx] = comm.irecv(receiveLinks[idx], source=idx+1);
                 status.count("Number of discovered links")
+                # add the new links to the sources
                 for link in links:
                     if link not in explored:
                         sources.append(link)

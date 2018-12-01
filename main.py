@@ -75,12 +75,14 @@ if rank == 0:
                     comm.isend('', dest=idx+1)
                 # start a new receive message from workers
                 receiveMessages[idx] = comm.irecv(source=idx+1)
-                status.count("Number of discovered links")
+                
                 # add the new links to the sources
                 if links is None:
                     continue
                 for link in links:
+                    status.count("Number of discovered links")
                     if link not in explored:
+                        status.count("Number of unique links")
                         sources.append(link)
                         explored.add(link)
                     else:
@@ -107,4 +109,5 @@ else:
             s.submitWords(keywords)
 
         # Send new links back to the master queue
-        comm.send(links, dest=0)  
+        comm.send(links, dest=0) 
+        time.sleep(1)

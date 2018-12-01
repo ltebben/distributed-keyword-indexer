@@ -77,6 +77,8 @@ if rank == 0:
                 receiveMessages[idx] = comm.irecv(source=idx+1)
                 status.count("Number of discovered links")
                 # add the new links to the sources
+                if links is None:
+                    continue
                 for link in links:
                     if link not in explored:
                         sources.append(link)
@@ -89,19 +91,20 @@ else:
     while True:
         # Wait to receive a source from the master
         source = comm.recv(source=0)
+        links = list()
 
         if source == '':
             # We got a blank link, wait for a while then ask again
             time.sleep(1)
-            continue
+        else:
 
-        s.setUrl(source.strip())
-        keywords, links = s.scrape()
+            s.setUrl(source.strip())
+            keywords, links = s.scrape()
 
-        print("number of links: " + str(len(links)))
+            print("number of links: " + str(len(links)))
 
-        # Persist keywords to the database
-        s.submitWords(keywords)
+            # Persist keywords to the database
+            s.submitWords(keywords)
 
         # Send new links back to the master queue
         comm.send(links, dest=0)  

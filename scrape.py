@@ -27,9 +27,11 @@ class Scrape:
             if not l or 'video.' in l or '/video/' in l:
                 continue
             pattern = re.match(r"http[s]?:\/\/(www\.)?(.*(\.com|\.org))(\/)?\.*", l)
-            root = pattern.group(2)
-            if pattern and self.url in root or root in self.url:
-                links.append(l)
+            
+            if pattern:
+                root = pattern.group(2)
+                if self.url in root or root in self.url:
+                    links.append(l)
             # TODO: Decide if we want to accept relative links too
             # elif l.startswith("/"):
             #     links.append(self.url+l)

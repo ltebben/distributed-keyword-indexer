@@ -32,4 +32,4 @@ class Status:
 
   # Give a new line at the end of reporting status
   def end(self):
-    print("\n") 
+    print("Ending status\n") 

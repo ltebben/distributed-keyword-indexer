@@ -1,3 +1,4 @@
+import sys
 import os
 import time
 import urllib.robotparser as roboparser
@@ -37,6 +38,12 @@ sources_file = open(SOURCES_LOC, "r")
 sources = sources_file.readlines()
 explored = set()
 
+# Initialize stopTime
+if len(sys.argv) == 2: 
+    stopTime = time.time() + int(sys.argv[1])
+else:
+    stopTime = -1
+
 if rank == 0:
     # Initialize status object
     status = Status()
@@ -57,7 +64,7 @@ if rank == 0:
             comm.isend('', dest=idx+1)
             
     # do stuff
-    while len(sources) > 0:
+    while len(sources) > 0 and (stopTime < 0 or time.time() < stopTime):
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             res = req.test()
@@ -85,9 +92,9 @@ if rank == 0:
                         explored.add(link)
                     else:
                         status.count("Number of repeated links")
-                       
+    status.end()                       
 else: 
-    while True:
+    while stopTime < 0 or time.time() < stopTime:
         # Wait to receive a source from the master
         source = comm.recv(source=0)
         links = list()
@@ -104,9 +111,7 @@ else:
             rp.read()
             if rp.can_fetch('*', source):
                 s.setUrl(source)
-                keywords, links = s.scrape()
-
-                print("number of links: " + str(len(links)))
+                keywords, links = s.scrape() 
 
                 # Persist keywords to the database
                 s.submitWords(keywords)

@@ -96,23 +96,20 @@ else:
             # We got a blank link, wait for a while then ask again
             time.sleep(1)
         else:
+            source = source.strip()
             parts = source.split('/')
             baseurl = '/'.join(parts[0:3])
             rp = roboparser.RobotFileParser()
             rp.set_url(baseurl + '/robots.txt')
-            try:
-                rp.read()
-                if rp.can_fetch('*', baseurl):
-                    s.setUrl(source.strip())
-                    keywords, links = s.scrape()
+            rp.read()
+            if rp.can_fetch('*', source):
+                s.setUrl(source)
+                keywords, links = s.scrape()
 
-                    print("number of links: " + str(len(links)))
+                print("number of links: " + str(len(links)))
 
-                    # Persist keywords to the database
-                    s.submitWords(keywords)
-            except Exception as e:
-                print(baseurl)
-                print(str(e))
+                # Persist keywords to the database
+                s.submitWords(keywords)
 
             
             

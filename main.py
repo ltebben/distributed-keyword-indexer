@@ -101,6 +101,8 @@ if rank == 0:
                         explored.add(link)
                     else:
                         status.count("Number of repeated links")
+        status.updateStats({"Number of keywords recorded": urls_collection.count({})})
+
     status.end()                       
 else: 
     while stopTime < 0 or time.time() < stopTime:

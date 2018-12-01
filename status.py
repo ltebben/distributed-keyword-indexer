@@ -1,3 +1,5 @@
+import time
+
 class Status:
   def __init__(self, logPath=None):
     self.logFile = open(logPath, "w")
@@ -30,7 +32,7 @@ class Status:
     statStr = " | ".join(statsStrs)
     
     # Write the status to a logfile
-    self.logFile.write(statStr + "\n")
+    self.logFile.write(str(int(time.time())) + ":" + statStr + "\n")
 
     # Print the status
     print("\r" + statStr, end="", flush=True)

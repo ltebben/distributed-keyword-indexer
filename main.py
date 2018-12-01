@@ -62,9 +62,10 @@ if rank == 0:
     while len(sources) > 0 and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
-            if req.test()[0]:
+            res = req.test()
+            if res[0]:
                 # Get the links the worker found
-                links = req.wait()
+                links = res[1]
                 # Send the worker the next link to work on
                 if len(sources) > 0:
                     # If there's a link to send, send it

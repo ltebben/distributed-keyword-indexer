@@ -25,7 +25,7 @@ class Scrape:
         for l in html.find_all('a'):
             l = l.get('href')
             video = ['video.', '/video/', '/video?']
-            if any(v in l for v in video):
+            if not l or any(v in l for v in video):
                 continue
             pattern = re.match(r"http[s]?:\/\/(www\.)?(.*(\.com|\.org))(\/)?\.*", l)
             

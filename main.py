@@ -51,6 +51,9 @@ if rank == 0:
     # Distribute sources to each worker. If more workers than sources, give same
     # sources to multiple workers so they can take different walks
 
+    # outstandingReqs tracks the number of outstanding requests
+    outstandingReqs = 0
+
     # The given index in this request object list corresponds to the worker of id index + 1
     receiveMessages = list()
     for idx in range(size - 1):
@@ -59,22 +62,26 @@ if rank == 0:
         if len(sources) > 0:
             # If there's a link to send, send it
             comm.isend(sources.pop(0), dest=idx+1)
+            outstandingReqs += 1
         else:
             # If there is no link, send a blank string and the worker will wait
             comm.isend('', dest=idx+1)
             
     # do stuff
-    while len(sources) > 0 and (stopTime < 0 or time.time() < stopTime):
+    while outstandingReqs > 0 and (stopTime < 0 or time.time() < stopTime):
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             res = req.test()
             if res[0]:
+                # Got a response, so deduct from outstandingReqs
+                outstandingReqs -= 1
                 # Get the links the worker found
                 links = res[1]
                 # Send the worker the next link to work on
                 if len(sources) > 0:
                     # If there's a link to send, send it
                     comm.isend(sources.pop(0), dest=idx+1)
+                    outstandingReqs += 1
                 else:
                     # If there is no link, send a blank string and the worker will wait
                     comm.isend('', dest=idx+1)

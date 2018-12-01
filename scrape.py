@@ -24,7 +24,8 @@ class Scrape:
         links = []
         for l in html.find_all('a'):
             l = l.get('href')
-            if l and (l.startswith("https://") or l.startswith("http://")):
+            pattern = re.match(r"(http[s]?://.*[\.com]/).*", l)
+            if pattern and self.url.startswith(pattern.group(1)):
                 links.append(l)
             # TODO: Decide if we want to accept relative links too
             # elif l.startswith("/"):

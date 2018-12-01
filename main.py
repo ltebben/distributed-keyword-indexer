@@ -48,7 +48,7 @@ if rank == 0:
     for idx in range(size - 1):
         receiveMessages.append(comm.irecv(source=idx+1))
     # do stuff
-    while source and i < 10:
+    while sources and i < 10:
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             if req.test():

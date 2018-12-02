@@ -45,6 +45,16 @@ class Scrape:
             return None
         return r.content
 
+    def keywordClean(self, word):
+        # Remove non word character
+        word = re.sub('\W', '', word)
+        # Remove digits
+        word = re.sub('\d', '', word)
+        # Return none for empty words, to be removed by later filter
+        if word == '':
+            return None
+        return word
+
     def findKeywords(self, html):
         keywords = set()
         # Get all paragraph tags in the html
@@ -56,6 +66,10 @@ class Scrape:
             # lowercase and split contents of paragraph to words list
             string = string.lower()
             words = string.split(' ')
+            # clean the words up
+            words = map(self.keywordClean, words)
+            # remove None results from map returning None on bad words
+            words = set(filter(lambda w: w is not None, words))
             # if there are less than 10 words, don't bother
             if len(words) > 10:
                 keywords.update(words)

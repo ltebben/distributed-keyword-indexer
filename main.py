@@ -17,9 +17,8 @@ MONGO_HOST = os.environ["MONGO_HOST"]
 MONGO_PORT = os.environ["MONGO_PORT"]
 MONGO_USER = os.environ["MONGO_USER"]
 MONGO_PASS = os.environ["MONGO_PASS"]
-
-MONGO_NAME = "dki"
-MONGO_COLLECTION = "Keywords"
+MONGO_NAME = os.environ["MONGO_NAME"]
+MONGO_COLLECTION = os.environ["MONGO_COLLECTION"]
 
 # Initialize database connection
 client = MongoClient(MONGO_HOST, int(MONGO_PORT))

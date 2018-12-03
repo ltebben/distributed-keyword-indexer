@@ -101,7 +101,7 @@ if rank == 0:
                         explored.add(link)
                     else:
                         status.count("Number of repeated links")
-        status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection), "Number of keywords recorded": urls_collection.count({})})
+        status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection)})
 
     status.end()                       
 else: 

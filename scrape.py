@@ -40,7 +40,7 @@ class Scrape:
         return links
 
     def makeRequest(self, url):
-        r = requests.get(url, timeout=3)
+        r = requests.get(url, timeout=10)
         if not r or r.status_code != 200:
             return None
         return r.content

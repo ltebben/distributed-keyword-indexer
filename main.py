@@ -8,6 +8,7 @@ from pymongo import MongoClient
 # Import project modules
 from scrape import Scrape
 from status import Status
+from measurements import *
 
 # Define constants for config files
 LOG_PATH = os.environ["LOG_PATH"]
@@ -68,8 +69,8 @@ if rank == 0:
             # If there is no link, send a blank string and the worker will wait
             comm.isend('', dest=idx+1)
             
-    # do stuff
-    while outstandingReqs > 0 and (stopTime < 0 or time.time() < stopTime):
+    # do stuff 
+    while outstandingReqs > 0 and (stopTime < 0 or time.time() < stopTime): 
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
             res = req.test()
@@ -100,7 +101,7 @@ if rank == 0:
                         explored.add(link)
                     else:
                         status.count("Number of repeated links")
-        status.updateStats({"Number of keywords recorded": urls_collection.count({})})
+        status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection), "Number of keywords recorded": urls_collection.count({})})
 
     status.end()                       
 else: 

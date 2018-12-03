@@ -74,13 +74,13 @@ while stopTime < 0 or time.time() < stopTime:
         # randomly select a next link to explore next
         # with 1/20 chance of starting again from root
         if randint(1,20) == 1:
-          source = source[rootIdx]
+            source = source[rootIdx]
         else:
-          linkIdx = randint(0, len(links)-1)
-          source = links[linkIdx]
+            linkIdx = randint(0, len(links)-1)
+            source = links[linkIdx]
     else:
         # If robots.txt disallows reading, shift the root source
         rootIdx = rootIdx + 1
-            source = sources[rootIdx]
+        source = sources[rootIdx]
 
         time.sleep(1)

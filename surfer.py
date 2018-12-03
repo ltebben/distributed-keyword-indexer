@@ -5,10 +5,12 @@ import urllib.robotparser as roboparser
 from mpi4py import MPI
 from pymongo import MongoClient
 from random import randint
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Import project modules
 from scrape import Scrape
 from status import Status
+from measurements import *
 
 # Define constants for config files
 LOG_PATH = os.environ["LOG_PATH"]
@@ -49,10 +51,21 @@ else:
 # Initialize the status
 status = Status(LOG_PATH)
 
+# Setup scheduled status update
+scheduler = BackgroundScheduler()
+@scheduler.scheduled_job('interval', seconds=1)
+def updateSurferStatus():
+    status.updateStats({"Number of Links": getNumLinks(urls_collection), "Number of Words": getNumWords(urls_collection)})
+
+# Initialize scheduled status update for one node
+if rank == 0:
+    scheduler.start()
+
 # Select the initial source
 rootIdx = rank % len(sources)
 source = sources[rootIdx]
 
+# Loop for surfer action
 while stopTime < 0 or time.time() < stopTime:
     source = source.strip()
     parts = source.split('/')
@@ -73,11 +86,11 @@ while stopTime < 0 or time.time() < stopTime:
             
         # randomly select a next link to explore next
         # with 1/20 chance of starting again from root
-        if randint(1,20) == 1:
-            source = source[rootIdx]
-        else:
+        if len(links) > 0 and randint(1,20) != 1:
             linkIdx = randint(0, len(links)-1)
             source = links[linkIdx]
+        else:
+            source = sources[rootIdx]
     else:
         # If robots.txt disallows reading, shift the root source
         rootIdx = rootIdx + 1

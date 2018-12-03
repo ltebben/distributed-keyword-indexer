@@ -6,6 +6,6 @@ def getNumWords(collection):
 def getNumLinks(collection):
     
     # Get sum of urls list lengths
-    result = collection.aggregate([{"$project": {"word": 1, "count": {"$size": "$urls"}}}, {"$group": {"_id": None, "total": {"$sum": "$count"}} }])
+    result = list(collection.aggregate([{"$project": {"word": 1, "count": {"$size": "$urls"}}}, {"$group": {"_id": None, "total": {"$sum": "$count"}} }]))
 
     return result[0]["total"]

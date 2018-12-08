@@ -40,7 +40,11 @@ class Scrape:
         return links
 
     def makeRequest(self, url):
-        r = requests.get(url, timeout=3)
+        r = None
+        try:
+            r = requests.get(url, timeout=3)
+        except Exception:
+            pass
         if not r or r.status_code != 200:
             return None
         return r.content
@@ -87,6 +91,9 @@ class Scrape:
         return [keywords, links] 
 
     def submitWords(self, words): 
+      if not words or len(words) == 0:
+          return
+
       inserts = [UpdateMany({"word": word}, {"$push": {"urls": self.url}}, upsert=True) for word in words]
       
       # Submit requests

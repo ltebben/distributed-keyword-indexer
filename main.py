@@ -93,8 +93,7 @@ if rank == 0:
                 # add the new links to the sources
                 if links is None:
                     continue
-                for link in links:
-                    status.count("Number of discovered links")
+                for link in links: 
                     if link not in explored:
                         status.count("Number of unique links")
                         sources.append(link)
@@ -105,7 +104,7 @@ if rank == 0:
 
     status.end()                       
 else: 
-    while stopTime < 0 or time.time() < stopTime:
+    while stopTime < 0 or time.time() < stopTime: 
         # Wait to receive a source from the master
         source = comm.recv(source=0)
         links = list()
@@ -125,9 +124,7 @@ else:
                 keywords, links = s.scrape() 
 
                 # Persist keywords to the database
-                s.submitWords(keywords)
-
-            
+                s.submitWords(keywords) 
             
         # Send new links back to the master queue
         comm.send(links, dest=0) 

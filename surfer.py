@@ -97,3 +97,5 @@ while stopTime < 0 or time.time() < stopTime:
         source = sources[rootIdx]
 
         time.sleep(1)
+
+clearCollection(urls_collection)

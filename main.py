@@ -98,10 +98,13 @@ if rank == 0:
                         status.count("Number of unique links")
                         sources.append(link)
                         explored.add(link)
+                        status.updateStats({"Queue length": len(sources)})
                     else:
                         status.count("Number of repeated links")
         status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection)})
 
+    # Clean up and terminate
+    clearCollection(urls_collection)
     status.end()                       
 else: 
     while stopTime < 0 or time.time() < stopTime: 

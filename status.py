@@ -29,10 +29,10 @@ class Status:
       self.stats[key] = val
 
     statsStrs = sorted([str(key) + ": " + str(val) for key, val in self.stats.items()])
-    statStr = " | ".join(statsStrs)
+    statStr = ", ".join(statsStrs)
     
     # Write the status to a logfile
-    self.logFile.write(str(int(time.time())) + ":" + statStr + "\n")
+    self.logFile.write(str(int(time.time())) + ", " + statStr + "\n")
 
     # Print the status
     print("\r" + statStr, end="", flush=True)

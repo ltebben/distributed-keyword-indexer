@@ -37,7 +37,7 @@ class Status:
       self.logFile.write(str(int(time.time())) + ", " + statStr + "\n")
 
     # Print the status
-    print("\r" + statStr, end="", flush=True)
+    print("\n" + statStr, end="", flush=True)
 
   # Give a new line at the end of reporting status
   def end(self):

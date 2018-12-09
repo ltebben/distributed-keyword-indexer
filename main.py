@@ -46,6 +46,7 @@ if len(sys.argv) == 2:
 else:
     stopTime = -1
 
+
 if rank == 0:
     # Initialize status object
     status = Status(LOG_PATH)
@@ -75,16 +76,21 @@ if rank == 0:
             # Check to see if the request has come back yet
             res = req.test()
             if res[0]:
+ 
                 # Got a response, so deduct from outstandingReqs
+                status.updateStats({"waiting": "no"})
                 outstandingReqs -= 1
                 # Get the links the worker found
                 links = res[1]
                 # Send the worker the next link to work on
                 if len(sources) > 0:
                     # If there's a link to send, send it
-                    comm.isend(sources.pop(0), dest=idx+1)
+                    nextLink = sources.pop(0)
+                    status.updateStats({"next": nextLink})
+                    comm.isend(nextLink, dest=idx+1)
                     outstandingReqs += 1
                 else:
+                    status.updateStats({"next": '""'})
                     # If there is no link, send a blank string and the worker will wait
                     comm.isend('', dest=idx+1)
                 # start a new receive message from workers
@@ -101,13 +107,22 @@ if rank == 0:
                         status.updateStats({"Queue length": len(sources)})
                     else:
                         status.count("Number of repeated links")
+            elif int(time.time()) % 20 == 0:
+              status.updateStats({"waiting": "yes"})
         status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection)})
 
     # Clean up and terminate
     clearCollection(urls_collection)
-    status.end()                       
+    status.end()                   
 else: 
+    it = 0
+    if rank == 1:
+        workerStat = Status()
     while stopTime < 0 or time.time() < stopTime: 
+        if rank == 1:
+            it += 1
+            workerStat.updateStats({"iteration": it})
+
         # Wait to receive a source from the master
         source = comm.recv(source=0)
         links = list()

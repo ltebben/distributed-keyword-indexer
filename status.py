@@ -2,7 +2,8 @@ import time
 
 class Status:
   def __init__(self, logPath=None):
-    self.logFile = open(logPath, "w")
+    if logPath:
+      self.logFile = open(logPath, "w")
     self.stats = {}
 
   # Get list of all stats being checked
@@ -32,12 +33,14 @@ class Status:
     statStr = ", ".join(statsStrs)
     
     # Write the status to a logfile
-    self.logFile.write(str(int(time.time())) + ", " + statStr + "\n")
+    if hasattr(self, "logFile"):
+      self.logFile.write(str(int(time.time())) + ", " + statStr + "\n")
 
     # Print the status
     print("\r" + statStr, end="", flush=True)
 
   # Give a new line at the end of reporting status
   def end(self):
-    self.logFile.close()
+    if hasattr(self, "logFile"):
+      self.logFile.close()
     print("\nEnding status\n") 

@@ -74,7 +74,11 @@ if rank == 0:
     while outstandingReqs > 0 and (stopTime < 0 or time.time() < stopTime): 
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
-            res = req.test()
+            res = (True, list())
+            try:
+                res = req.test()
+            except Exception:
+                pass
             if res[0]:
  
                 # Got a response, so deduct from outstandingReqs
@@ -116,34 +120,44 @@ if rank == 0:
     status.end()                   
 else: 
     it = 0
-    if rank == 1:
-        workerStat = Status()
+    workerStat = Status()
     while stopTime < 0 or time.time() < stopTime: 
-        if rank == 1:
-            it += 1
-            workerStat.updateStats({"iteration": it})
+        it += 1
+        workerStat.updateStats({"iteration": it, "last line": "start"})
 
         # Wait to receive a source from the master
         source = comm.recv(source=0)
+        workerStat.updateStats({"last line": "receive link from master"})
         links = list()
 
         if source == '':
             # We got a blank link, wait for a while then ask again
             time.sleep(1)
+            workerStat.updateStats({"last line": "no source so sleep"})
         else:
+            workerStat.updateStats({"last line": "working on source"})
             source = source.strip()
             parts = source.split('/')
             baseurl = '/'.join(parts[0:3])
             rp = roboparser.RobotFileParser()
             rp.set_url(baseurl + '/robots.txt')
+            workerStat.updateStats({"last line": "about to read robots.txt"})
+
             rp.read()
+
+            workerStat.updateStats({"last line": "readed robots.txt"})
             if rp.can_fetch('*', source):
+                workerStat.updateStats({"last line": "can read site according to robots.txt"})
                 s.setUrl(source)
                 keywords, links = s.scrape() 
+                workerStat.updateStats({"last line": "readed the given link"})
 
                 # Persist keywords to the database
-                s.submitWords(keywords) 
-            
+                s.submitWords(keywords)
+                
+                workerStat.updateStats({"last line": "submitted words to the database"})
+
         # Send new links back to the master queue
         comm.send(links, dest=0) 
+        workerStat.updateStats({"last line": "sent links back to the master"})
         time.sleep(1)

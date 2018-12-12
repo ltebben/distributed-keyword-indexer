@@ -11,5 +11,3 @@ pyvenv.cfg
 # environment variables
 .env
 
-# logfiles
-*.log

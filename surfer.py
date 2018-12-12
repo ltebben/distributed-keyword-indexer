@@ -82,11 +82,11 @@ while stopTime < 0 or time.time() < stopTime:
         keywords, links = s.scrape() 
 
         # Persist keywords to the database
-        s.submitWords(keywords)
+        #s.submitWords(keywords)
             
         # randomly select a next link to explore next
         # with 1/20 chance of starting again from root
-        if not links or len(links) > 0 and randint(1,20) != 1:
+        if links and len(links) > 0 and randint(1,20) != 1:
             linkIdx = randint(0, len(links)-1)
             source = links[linkIdx]
         else:

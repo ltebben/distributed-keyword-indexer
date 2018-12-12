@@ -39,6 +39,7 @@ size = comm.Get_size()
 sources_file = open(SOURCES_LOC, "r")
 sources = sources_file.readlines()
 explored = set()
+uniqueKeywords = set()
 
 # Initialize stopTime
 if len(sys.argv) == 2: 
@@ -83,8 +84,10 @@ if rank == 0:
  
                 # Got a response, so deduct from outstandingReqs
                 outstandingReqs -= 1
+                # Get the keywords from the worker
+                keywords = res[1][0]
                 # Get the links the worker found
-                links = res[1]
+                links = res[1][1]
                 # Send the worker the next link to work on
                 if len(sources) > 0:
                     # If there's a link to send, send it
@@ -97,6 +100,10 @@ if rank == 0:
                     comm.isend('', dest=idx+1)
                 # start a new receive message from workers
                 receiveMessages[idx] = comm.irecv(source=idx+1)
+
+                # Add keywords to unique keywords
+                uniqueKeywords.update(keywords)
+                status.updateStats({"Unique keywords" : len(uniqueKeywords)})
                 
                 # add the new links to the sources
                 if links is None:
@@ -141,8 +148,9 @@ else:
                 keywords, links = s.scrape() 
 
                 # Persist keywords to the database
-                s.submitWords(keywords)
+                # commenting out because this is such a bottleneck
+                # s.submitWords(keywords)
 
         # Send new links back to the master queue
-        comm.send(links, dest=0) 
+        comm.send((keywords, links), dest=0) 
         time.sleep(1)

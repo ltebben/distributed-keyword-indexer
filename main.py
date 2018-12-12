@@ -82,7 +82,6 @@ if rank == 0:
             if res[0]:
  
                 # Got a response, so deduct from outstandingReqs
-                status.updateStats({"waiting": "no"})
                 outstandingReqs -= 1
                 # Get the links the worker found
                 links = res[1]
@@ -90,11 +89,10 @@ if rank == 0:
                 if len(sources) > 0:
                     # If there's a link to send, send it
                     nextLink = sources.pop(0)
-                    status.updateStats({"next": nextLink})
+                    status.count("Links sent to workers:")
                     comm.isend(nextLink, dest=idx+1)
                     outstandingReqs += 1
                 else:
-                    status.updateStats({"next": '""'})
                     # If there is no link, send a blank string and the worker will wait
                     comm.isend('', dest=idx+1)
                 # start a new receive message from workers
@@ -112,8 +110,6 @@ if rank == 0:
                     else:
                         status.count("Number of repeated links")
             elif int(time.time()) % 20 == 0:
-              status.updateStats({"waiting": "yes"})
-        status.updateStats({"Measured num words": getNumWords(urls_collection), "Measured num links": getNumLinks(urls_collection)})
 
     # Clean up and terminate
     clearCollection(urls_collection)
@@ -123,11 +119,9 @@ else:
     workerStat = Status()
     while stopTime < 0 or time.time() < stopTime: 
         it += 1
-        workerStat.updateStats({"iteration": it, "last line": "start"})
 
         # Wait to receive a source from the master
         source = comm.recv(source=0)
-        workerStat.updateStats({"last line": "receive link from master"})
         links = list()
 
         if source == '':

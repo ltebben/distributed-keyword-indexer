@@ -14,21 +14,21 @@ from measurements import *
 LOG_PATH = os.environ["LOG_PATH"]
 SOURCES_LOC = "sources.txt"
 
-MONGO_HOST = os.environ["MONGO_HOST"]
-MONGO_PORT = os.environ["MONGO_PORT"]
-MONGO_USER = os.environ["MONGO_USER"]
-MONGO_PASS = os.environ["MONGO_PASS"]
-MONGO_NAME = os.environ["MONGO_NAME"]
-MONGO_COLLECTION = os.environ["MONGO_COLLECTION"]
+#MONGO_HOST = os.environ["MONGO_HOST"]
+#MONGO_PORT = os.environ["MONGO_PORT"]
+#MONGO_USER = os.environ["MONGO_USER"]
+#MONGO_PASS = os.environ["MONGO_PASS"]
+#MONGO_NAME = os.environ["MONGO_NAME"]
+#MONGO_COLLECTION = os.environ["MONGO_COLLECTION"]
 
 # Initialize database connection
-client = MongoClient(MONGO_HOST, int(MONGO_PORT))
-db = client[MONGO_NAME]
-db.authenticate(MONGO_USER, MONGO_PASS)
-urls_collection = db[MONGO_COLLECTION]
+#client = MongoClient(MONGO_HOST, int(MONGO_PORT))
+#db = client[MONGO_NAME]
+#db.authenticate(MONGO_USER, MONGO_PASS)
+#urls_collection = db[MONGO_COLLECTION]
 
 # Initialize scraper
-s = Scrape(collection=urls_collection)
+s = Scrape()
 
 # Initialize mpi cluster variables
 comm = MPI.COMM_WORLD
@@ -75,24 +75,30 @@ if rank == 0:
     while outstandingReqs > 0 and (stopTime < 0 or time.time() < stopTime): 
         for idx, req in enumerate(receiveMessages):
             # Check to see if the request has come back yet
-            res = (True, list())
+            res = (True, (list(), list()))
             try:
                 res = req.test()
             except Exception:
                 pass
             if res[0]:
- 
                 # Got a response, so deduct from outstandingReqs
                 outstandingReqs -= 1
-                # Get the keywords from the worker
+                
+                # Get the keywords from the worker 
                 keywords = res[1][0]
+                if not keywords:
+                    keywords = list()
+                
                 # Get the links the worker found
                 links = res[1][1]
+                if not links:
+                    links = list()
+                
                 # Send the worker the next link to work on
                 if len(sources) > 0:
                     # If there's a link to send, send it
                     nextLink = sources.pop(0)
-                    status.count("Links sent to workers:")
+                    status.count("Links sent to workers")
                     comm.isend(nextLink, dest=idx+1)
                     outstandingReqs += 1
                 else:
@@ -120,15 +126,14 @@ if rank == 0:
     # Clean up and terminate
     clearCollection(urls_collection)
     status.end()                   
-else: 
-    it = 0
-    workerStat = Status()
+else:  
     while stopTime < 0 or time.time() < stopTime: 
-        it += 1
+        
 
         # Wait to receive a source from the master
         source = comm.recv(source=0)
         links = list()
+        keywords = list()
 
         if source == '':
             # We got a blank link, wait for a while then ask again

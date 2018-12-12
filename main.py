@@ -133,31 +133,22 @@ else:
         if source == '':
             # We got a blank link, wait for a while then ask again
             time.sleep(1)
-            workerStat.updateStats({"last line": "no source so sleep"})
         else:
-            workerStat.updateStats({"last line": "working on source"})
             source = source.strip()
             parts = source.split('/')
             baseurl = '/'.join(parts[0:3])
             rp = roboparser.RobotFileParser()
             rp.set_url(baseurl + '/robots.txt')
-            workerStat.updateStats({"last line": "about to read robots.txt"})
 
             rp.read()
 
-            workerStat.updateStats({"last line": "readed robots.txt"})
             if rp.can_fetch('*', source):
-                workerStat.updateStats({"last line": "can read site according to robots.txt"})
                 s.setUrl(source)
                 keywords, links = s.scrape() 
-                workerStat.updateStats({"last line": "readed the given link"})
 
                 # Persist keywords to the database
                 s.submitWords(keywords)
-                
-                workerStat.updateStats({"last line": "submitted words to the database"})
 
         # Send new links back to the master queue
         comm.send(links, dest=0) 
-        workerStat.updateStats({"last line": "sent links back to the master"})
         time.sleep(1)

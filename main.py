@@ -116,7 +116,6 @@ if rank == 0:
                         status.updateStats({"Queue length": len(sources)})
                     else:
                         status.count("Number of repeated links")
-            elif int(time.time()) % 20 == 0:
 
     # Clean up and terminate
     clearCollection(urls_collection)
